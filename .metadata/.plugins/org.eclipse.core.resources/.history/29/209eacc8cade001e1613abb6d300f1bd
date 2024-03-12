@@ -1,0 +1,26 @@
+package com.venu.insurance.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.venu.insurance.repo.CitizenPlansRepo;
+
+@Service
+public class CitizenPlanServiceImpl implements CitizenPlanService{
+	
+	CitizenPlansRepo citizenPlansRepo;
+
+	@Override
+	public List<String> getAllPlans() throws Exception {
+	 List<String> bo = citizenPlansRepo.getAllPlanNames();
+	 return bo;
+	}
+
+	@Override
+	public List<String> getAllPlansStatus() throws Exception {
+		 List<String> bo = citizenPlansRepo.getAllPlanStatus();
+		 return bo;
+	}
+
+}

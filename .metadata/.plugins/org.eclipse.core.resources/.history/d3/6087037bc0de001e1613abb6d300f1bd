@@ -1,0 +1,5 @@
+package com.venu.insurance.repo;
+
+public class CitizenPlanRepo {
+
+}

@@ -1,0 +1,13 @@
+package com.venu.insurance.model;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+@Entity
+@Table
+public class CitizenPlans {
+	
+	private Long citizend;
+	private String citizenName;
+	
+
+}

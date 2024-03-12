@@ -1,0 +1,190 @@
+package com.venu.insurance.service;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.CMYKColor;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+import com.venu.insurance.dto.SearchDto;
+import com.venu.insurance.model.CitizenPlans;
+import com.venu.insurance.repo.CitizenPlansRepo;
+
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+
+@Service
+public class CitizenPlanServiceImpl implements CitizenPlanService{
+	
+	@Autowired
+	CitizenPlansRepo citizenPlansRepo;
+
+	@Override
+	public List<String> getAllPlans() throws Exception {
+	 List<String> bo = citizenPlansRepo.getAllPlanNames();
+	 return bo;
+	}
+
+	@Override
+	public List<String> getAllPlansStatus() throws Exception {
+		 List<String> bo = citizenPlansRepo.getAllPlanStatus();
+		 return bo;
+	}
+	
+	@Override
+	public List<CitizenPlans> getAllData() throws Exception {
+		 List<CitizenPlans> bo = citizenPlansRepo.findAll();
+		 return bo;
+	}
+
+	@Override
+	public List<CitizenPlans> handleSearch(SearchDto searchDto) throws Exception {
+		 List<CitizenPlans> bo= new ArrayList<CitizenPlans>();
+		 CitizenPlans entity = new CitizenPlans();
+		 if(searchDto.getPlanNAme() != null && !searchDto.getPlanNAme().isEmpty()) {
+			 entity.setCitizenPlan(searchDto.getPlanNAme());
+		 }
+		 if(searchDto.getPlanStatus() != null && !searchDto.getPlanStatus().isEmpty()) {
+			 entity.setCitizenSratus(searchDto.getPlanStatus());
+		 }
+		 if(searchDto.getGender() != null && !searchDto.getGender().isEmpty()) {
+			 entity.setGender(searchDto.getGender());
+		 }
+		 if(searchDto.getStartDate() != null && !searchDto.getStartDate().isEmpty()) {
+			 String sDate = searchDto.getStartDate();
+			 DateFormat formatter = new SimpleDateFormat("d-MMM-yyyy");
+			 Date date = formatter.parse(sDate);
+			 entity.setPlanStartDate(date);
+		 }
+		 if(searchDto.getEndDate() != null && !searchDto.getEndDate().isEmpty()) {
+			 String eDate = searchDto.getEndDate();
+			 DateFormat formatter = new SimpleDateFormat("d-MMM-yyyy");
+			 Date date = formatter.parse(eDate);
+			 entity.setPlanEndDate(date);
+		 }
+		
+			bo = citizenPlansRepo.findAll(Example.of(entity)); 
+		 
+		 return bo;
+	}
+	
+	@Override
+	public boolean exportExacel(HttpServletResponse response) throws Exception{
+		
+		//HSSFWorkbook this will work for xls format
+		//Workbook workBook = new HSSFWorkbook();
+		Workbook workBook =new  XSSFWorkbook();
+		Sheet sheet = workBook.createSheet("plan-data");
+		Row headerRow = sheet.createRow(0);
+		headerRow.createCell(0).setCellValue("ID");
+		headerRow.createCell(1).setCellValue("Citizen Name");
+		headerRow.createCell(2).setCellValue("Plan Name");
+		headerRow.createCell(3).setCellValue("Plan Status");
+		headerRow.createCell(4).setCellValue("Plan End Date");
+		headerRow.createCell(5).setCellValue("Plan Start Date");
+		headerRow.createCell(6).setCellValue("Benefit amt");
+		
+		Integer dataRowIndex = 1;
+		List<CitizenPlans> bo = citizenPlansRepo.findAll();
+		for(CitizenPlans plan :bo) {
+			Row dataRow = sheet.createRow(dataRowIndex);
+			dataRow.createCell(0).setCellValue(plan.getCitizenId());
+			dataRow.createCell(1).setCellValue(plan.getCitizenName());
+			dataRow.createCell(2).setCellValue(plan.getCitizenPlan());
+			dataRow.createCell(3).setCellValue(plan.getCitizenSratus());
+			dataRow.createCell(4).setCellValue(plan.getPlanStartDate());
+			dataRow.createCell(5).setCellValue(plan.getPlanEndDate());
+			if(plan.getBenifitAmt() != null) {
+			dataRow.createCell(6).setCellValue(plan.getBenifitAmt());
+			}else {
+				dataRow.createCell(6).setCellValue("N/A");
+			}
+			dataRowIndex ++;
+			
+		}
+		
+//		FileOutputStream fos = new FileOutputStream(new File("plans.xls"));
+//		workBook.write(fos);
+		
+	ServletOutputStream outputStream =	response.getOutputStream();
+	workBook.write(outputStream);
+	workBook.close();
+	
+	return true;
+		
+	}
+
+	@Override
+	public void exportPdf(HttpServletResponse response) throws Exception {
+		// Creating the Object of Document
+				Document document = new Document(PageSize.A4);
+				
+				// Getting instance of PdfWriter
+				PdfWriter.getInstance(document, response.getOutputStream());
+				
+				// Opening the created document to modify it
+				document.open();
+
+				// Creating font
+				// Setting font style and size
+				Font fontTiltle = FontFactory.getFont(FontFactory.TIMES_ROMAN);
+				Paragraph paragraph = new Paragraph("List Of Students", fontTiltle);
+				document.add(paragraph);
+				
+				// Creating a table of 3 columns
+				PdfPTable table = new PdfPTable(3);
+				// Setting width of table, its columns and spacing
+				table.addCell("Id");
+				table.addCell("Citizen Name");
+				table.addCell("Plan Name");
+				table.addCell("Plan Status");
+				table.addCell("Plan End Date");
+				table.addCell("Plan Start Date");
+				table.addCell("Benefit amt");
+				
+				List<CitizenPlans> bo = citizenPlansRepo.findAll();
+				for(CitizenPlans plan: bo) {
+					table.addCell(plan.getCitizenId().toString());
+					table.addCell(plan.getCitizenName());
+					table.addCell(plan.getCitizenPlan());
+					table.addCell(plan.getCitizenSratus());
+					table.addCell(plan.getPlanStartDate()+ "");
+					table.addCell(plan.getPlanEndDate() + "");
+					table.addCell(plan.getBenifitAmt()+ "");
+				}
+
+				// Create Table Cells for table header
+				PdfPCell cell = new PdfPCell();
+
+				// Setting the background color and padding
+				cell.setBackgroundColor(CMYKColor.MAGENTA);
+				cell.setPadding(5);
+				
+				
+		
+	}
+
+	
+	
+	
+	
+	
+
+}

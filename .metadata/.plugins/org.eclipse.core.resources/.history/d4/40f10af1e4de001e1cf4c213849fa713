@@ -1,0 +1,48 @@
+package com.venu.insurance.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.venu.insurance.dto.SearchDto;
+import com.venu.insurance.model.CitizenPlans;
+import com.venu.insurance.repo.CitizenPlansRepo;
+
+@Service
+public class CitizenPlanServiceImpl implements CitizenPlanService{
+	
+	CitizenPlansRepo citizenPlansRepo;
+
+	@Override
+	public List<String> getAllPlans() throws Exception {
+	 List<String> bo = citizenPlansRepo.getAllPlanNames();
+	 return bo;
+	}
+
+	@Override
+	public List<String> getAllPlansStatus() throws Exception {
+		 List<String> bo = citizenPlansRepo.getAllPlanStatus();
+		 return bo;
+	}
+	
+	@Override
+	public List<CitizenPlans> getAllData() throws Exception {
+		 List<CitizenPlans> bo = citizenPlansRepo.findAll();
+		 return bo;
+	}
+
+	@Override
+	public List<CitizenPlans> handleSearch(SearchDto searchDto) throws Exception {
+		 List<CitizenPlans> bo= new ArrayList<CitizenPlans>();
+		 if(searchDto== null) {
+			bo = citizenPlansRepo.findAll(); 
+		 }
+		 return bo;
+	}
+	
+	
+	
+	
+
+}

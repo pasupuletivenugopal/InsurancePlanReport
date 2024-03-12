@@ -1,0 +1,60 @@
+package com.venu.insurance.runner;
+
+import java.util.Date;
+
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
+
+import com.venu.insurance.model.CitizenPlans;
+@Component
+public class DataLoader implements ApplicationRunner{
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		//cash plan data
+		CitizenPlans cl = new CitizenPlans();
+		cl.setCitizenName("john");
+		cl.setGender("male");
+		cl.setCitizenPlan("cash");
+		cl.setCitizenSratus("approved");
+		cl.setPlanStartDate(new Date());
+		cl.setPlanEndDate(new Date());
+		cl.setBenifitAmt(5000.00);
+		
+			CitizenPlans c2 = new CitizenPlans();
+		c2.setCitizenName("smith");
+		c2.setGender("male");
+		c2.setCitizenPlan("cash");
+		c2.setCitizenSratus("Denied");
+		c2.setDenaidReason("due to rent");
+		
+		CitizenPlans c3 = new CitizenPlans();
+		c3.setCitizenName("venu");
+		c3.setGender("male");
+		c3.setCitizenPlan("cash");
+		c3.setCitizenSratus("Termaniated");
+		c3.setTerminationReason("he got job");
+		c3.setPlanStartDate(new Date());
+		c3.setPlanEndDate(new Date());
+		c3.setBenifitAmt(5000.00);
+		//food
+		CitizenPlans c4 = new CitizenPlans();
+		c4.setCitizenName("sai");
+		c4.setGender("male");
+		c4.setCitizenPlan("cash");
+		c4.setCitizenSratus("approved");
+		c4.setPlanStartDate(new Date());
+		c4.setPlanEndDate(new Date());
+		c4.setBenifitAmt(5000.00);
+		
+			CitizenPlans c5 = new CitizenPlans();
+		c5.setCitizenName("reka");
+		c5.setGender("female");
+		c5.setCitizenPlan("cash");
+		c5.setCitizenSratus("Denied");
+		c5.setDenaidReason("due to rent");
+		
+	}
+
+}

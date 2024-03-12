@@ -1,0 +1,5 @@
+package com.venu.insurance.repo;
+
+public interface CitizenPlansRepo {
+
+}

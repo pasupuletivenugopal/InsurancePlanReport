@@ -1,0 +1,22 @@
+package com.venu.insurance.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+@Data
+@Table(name ="CITIZEN_PLANS_INFO")
+@Entity
+public class CitizenPlans {
+	
+	private Long citizend;
+	private String citizenName;
+	private String citizenPlan;
+	private String citizenSratus;
+	private String terminationReason;
+	private Sting denaidReason;
+	private Double benifitAmt;
+	private String gender;
+	private Date planStartDate;
+	private Date planEndDate;
+	
+
+}

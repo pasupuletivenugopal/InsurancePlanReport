@@ -1,0 +1,5 @@
+package com.venu.insurance.service;
+
+public interface CitizenPlanService {
+
+}

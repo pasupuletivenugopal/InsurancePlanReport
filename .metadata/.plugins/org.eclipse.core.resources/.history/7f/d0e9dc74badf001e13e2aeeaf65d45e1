@@ -1,0 +1,131 @@
+package com.venu.insurance.service;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
+
+import com.venu.insurance.dto.SearchDto;
+import com.venu.insurance.model.CitizenPlans;
+import com.venu.insurance.repo.CitizenPlansRepo;
+
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+
+@Service
+public class CitizenPlanServiceImpl implements CitizenPlanService{
+	
+	CitizenPlansRepo citizenPlansRepo;
+
+	@Override
+	public List<String> getAllPlans() throws Exception {
+	 List<String> bo = citizenPlansRepo.getAllPlanNames();
+	 return bo;
+	}
+
+	@Override
+	public List<String> getAllPlansStatus() throws Exception {
+		 List<String> bo = citizenPlansRepo.getAllPlanStatus();
+		 return bo;
+	}
+	
+	@Override
+	public List<CitizenPlans> getAllData() throws Exception {
+		 List<CitizenPlans> bo = citizenPlansRepo.findAll();
+		 return bo;
+	}
+
+	@Override
+	public List<CitizenPlans> handleSearch(SearchDto searchDto) throws Exception {
+		 List<CitizenPlans> bo= new ArrayList<CitizenPlans>();
+		 CitizenPlans entity = new CitizenPlans();
+		 if(searchDto.getPlanNAme() != null && !searchDto.getPlanNAme().isEmpty()) {
+			 entity.setCitizenPlan(searchDto.getPlanNAme());
+		 }
+		 if(searchDto.getPlanStatus() != null && !searchDto.getPlanStatus().isEmpty()) {
+			 entity.setCitizenSratus(searchDto.getPlanStatus());
+		 }
+		 if(searchDto.getGender() != null && !searchDto.getGender().isEmpty()) {
+			 entity.setGender(searchDto.getGender());
+		 }
+		 if(searchDto.getStartDate() != null && !searchDto.getStartDate().isEmpty()) {
+			 String sDate = searchDto.getStartDate();
+			 DateFormat formatter = new SimpleDateFormat("d-MMM-yyyy");
+			 Date date = formatter.parse(sDate);
+			 entity.setPlanStartDate(date);
+		 }
+		 if(searchDto.getEndDate() != null && !searchDto.getEndDate().isEmpty()) {
+			 String eDate = searchDto.getEndDate();
+			 DateFormat formatter = new SimpleDateFormat("d-MMM-yyyy");
+			 Date date = formatter.parse(eDate);
+			 entity.setPlanEndDate(date);
+		 }
+		
+			bo = citizenPlansRepo.findAll(Example.of(entity)); 
+		 
+		 return bo;
+	}
+	
+	@Override
+	public boolean exportExacel(HttpServletResponse response) throws Exception{
+		
+		Workbook workBook = new HSSFWorkbook();
+		Sheet sheet = workBook.createSheet("plan-data");
+		Row headerRow = sheet.createRow(0);
+		headerRow.createCell(0).setCellValue("ID");
+		headerRow.createCell(1).setCellValue("Citizen Name");
+		headerRow.createCell(2).setCellValue("Plan Name");
+		headerRow.createCell(3).setCellValue("Plan Status");
+		headerRow.createCell(4).setCellValue("Plan End Date");
+		headerRow.createCell(5).setCellValue("Plan Start Date");
+		headerRow.createCell(6).setCellValue("Benefit amt");
+		
+		Integer dataRowIndex = 1;
+		List<CitizenPlans> bo = citizenPlansRepo.findAll();
+		for(CitizenPlans plan :bo) {
+			Row dataRow = sheet.createRow(dataRowIndex);
+			dataRow.createCell(0).setCellValue(plan.getCitizenId());
+			dataRow.createCell(1).setCellValue(plan.getCitizenName());
+			dataRow.createCell(2).setCellValue(plan.getCitizenPlan());
+			dataRow.createCell(3).setCellValue(plan.getCitizenSratus());
+			dataRow.createCell(4).setCellValue(plan.getPlanStartDate());
+			dataRow.createCell(5).setCellValue(plan.getPlanEndDate());
+			if(plan.getBenifitAmt() != null) {
+			dataRow.createCell(6).setCellValue(plan.getBenifitAmt());
+			}else {
+				dataRow.createCell(6).setCellValue("N/A");
+			}
+			dataRowIndex ++;
+			
+			
+		}
+		
+//		FileOutputStream fos = new FileOutputStream(new File("plans.xls"));
+//		workBook.write(fos);
+		
+	ServletOutputStream outputStream =	response.getOutputStream();
+	workBook.write(outputStream);
+	workBook.close();
+	return true;
+	
+	  
+		
+	}
+
+	
+	
+	
+	
+	
+
+}

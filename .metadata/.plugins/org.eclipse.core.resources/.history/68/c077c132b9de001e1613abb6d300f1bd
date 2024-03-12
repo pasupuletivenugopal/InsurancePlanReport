@@ -1,0 +1,9 @@
+package com.venu.insurance.model;
+@Ent
+public class CitizenPlans {
+	
+	private Long citizend;
+	private String citizenName;
+	
+
+}

@@ -1,0 +1,5 @@
+package com.venu.insurance.dto;
+
+public class SearchDto {
+
+}

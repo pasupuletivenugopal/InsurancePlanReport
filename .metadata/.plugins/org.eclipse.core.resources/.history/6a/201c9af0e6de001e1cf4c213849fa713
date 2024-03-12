@@ -1,0 +1,65 @@
+package com.venu.insurance.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
+
+import com.venu.insurance.dto.SearchDto;
+import com.venu.insurance.model.CitizenPlans;
+import com.venu.insurance.repo.CitizenPlansRepo;
+
+@Service
+public class CitizenPlanServiceImpl implements CitizenPlanService{
+	
+	CitizenPlansRepo citizenPlansRepo;
+
+	@Override
+	public List<String> getAllPlans() throws Exception {
+	 List<String> bo = citizenPlansRepo.getAllPlanNames();
+	 return bo;
+	}
+
+	@Override
+	public List<String> getAllPlansStatus() throws Exception {
+		 List<String> bo = citizenPlansRepo.getAllPlanStatus();
+		 return bo;
+	}
+	
+	@Override
+	public List<CitizenPlans> getAllData() throws Exception {
+		 List<CitizenPlans> bo = citizenPlansRepo.findAll();
+		 return bo;
+	}
+
+	@Override
+	public List<CitizenPlans> handleSearch(SearchDto searchDto) throws Exception {
+		 List<CitizenPlans> bo= new ArrayList<CitizenPlans>();
+		 CitizenPlans entity = new CitizenPlans();
+		 if(searchDto.getPlanNAme() != null && !searchDto.getPlanNAme().isEmpty()) {
+			 entity.setCitizenPlan(searchDto.getPlanNAme());
+		 }
+		 if(searchDto.getPlanStatus() != null && !searchDto.getPlanStatus().isEmpty()) {
+			 entity.setCitizenSratus(searchDto.getPlanStatus());
+		 }
+		 if(searchDto.getGender() != null && !searchDto.getGender().isEmpty()) {
+			 entity.setGender(searchDto.getGender());
+		 }
+		 if(searchDto.getStartDate() != null && !searchDto.getStartDate().isEmpty()) {
+			 entity.setPlanStartDate(searchDto.getStartDate().toString());
+		 }
+		 if(searchDto.getPlanNAme() != null && !searchDto.getPlanNAme().isEmpty()) {
+			 entity.setCitizenPlan(searchDto.getPlanNAme());
+		 }
+		
+			bo = citizenPlansRepo.findAll(Example.of(entity)); 
+		 
+		 return bo;
+	}
+	
+	
+	
+	
+
+}
